@@ -1,23 +1,18 @@
 <meta charset="utf-8">
-
-
-
 <head>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://d3js.org/d3.v3.js"></script>
-
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-  <script src="datamaps.usa.min.js"></script>
-  <script src="colorbrewer.v1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="js/hashtable.js"></script>
-  <script src="js/d3cloud.js"></script>
-  <script src="js/d3-tooltip.js"></script>
+  <script src="lib/datamaps.usa.min.js"></script>
+  <script src="lib/colorbrewer.v1.min.js"></script>
+  <script src="lib/hashtable.js"></script>
+  <script src="lib/d3cloud.js"></script>
+  <script src="lib/d3-tooltip.js"></script>
+  <script src="lib/cmatrix.js"></script>
   <script src="js/terms-generator.js"></script>
-  <script src="js/cmatrix.js"></script>
-  <script src="legend.js"></script>
+  <script src="js/legend.js"></script>
   <script type="http://spin.js.org/spin.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/app.css">
@@ -32,7 +27,7 @@
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
 <body>
@@ -235,7 +230,6 @@ var myDiseaseName = "all";
       }
 
         wnallTermsArray = localallTermsArray;
-        console.log(wnallTermsArray);
         wnallTermsMap = localallTermsMap;
         allTermsArray = wnallTermsArray;
         allTermsMap = wnallTermsMap
@@ -245,12 +239,9 @@ var myDiseaseName = "all";
         //Set stream graph, topterms.monthfreq contains monthly frequency
         setStreamGraph(topTerms);
        cloudmessages.attr("opacity", 0);
-           // console.log(data);
-           // debugger;
     });
 
     data2.startProcess2(filename, function (data) {
-            console.log(data)
             globalContentData = data;
            var localallTermsArray = [];
       var localallTermsMap;
@@ -453,7 +444,6 @@ var myDiseaseName = "all";
       });
     }
 
-console.log(globalAllDiseaseTerms)
     function loadDataUpdate(dName) {
     var localallTermsArray = [];
     var localallTermsMap;
@@ -1626,7 +1616,7 @@ color = d3.scale.linear()
 secondColor = color(-0.5)
 thirdColor = color(-0.25)
 
-d3.csv("diseaseDatalonglan.csv", function(error, dict) {
+d3.csv("data/diseaseDatalonglan.csv", function(error, dict) {
 newDict = [];
 for(i = 0 ;i < dict.length; i++){
   usLocation = dict[i].location.split(',');
@@ -2429,7 +2419,6 @@ if(diseaseName == "all"){
   }
 }
 
-// debugger;
 a = d3.selectAll('.datamaps-hoverover')
 if(a[0].length > 0)
   a = d3.selectAll('.datamaps-hoverover').remove()
@@ -2437,8 +2426,7 @@ if(a[0].length > 0)
 if(document.getElementById('mapSvg') != null)
   document.getElementById('mapSvg').remove()
 
-// debugger;
-  var freqMap = new Datamap({
+var freqMap = new Datamap({
     element: document.getElementById('container'),
     scope: 'usa',
     data_width: '100',
@@ -2667,7 +2655,6 @@ d3.selectAll('#userFreq svg').remove()
     if(diseaseName != "all")
       svg.selectAll('rect').attr("fill", mapColor)
     else{
-      debugger;
       rectBar = d3.selectAll(".bar")
       for(i = 0 ; i < rectBar[0].length;i++){
           rectColor = rectBar[0][0].getElementsByTagName("rect");

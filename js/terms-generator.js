@@ -92,9 +92,6 @@ function preProcessData() {
       });
 
       callback(allTerms);
-      // console.log(lines);
-      console.log(allTerms);
-      
     });
   }
 
