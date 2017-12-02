@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg {
+  font: 10px sans-serif;
+  padding: 10px;
+}
+
+path { 
+    stroke: #0a0;
+    stroke-width: 1;
+    stroke-opacity: 0.75;
+    fill: none;
+}
+
+.axis,
+.frame {
+  shape-rendering: crispEdges;
+}
+.axis line {
+  stroke: #888;
+}
+
+.axis path {
+  display: none;
+}
+
+
+.cell text {
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.frame {
+  stroke: #444;
+}
+
+
+circle {
+  fill-opacity: .8;
+}
+
+circle.hidden {
+  fill: #ccc !important;
+}
+.extent {
+  fill: #000;
+  fill-opacity: .125;
+  stroke: #fff;
+}
+
+/* tooltip */
+.d3-tip {
+  line-height: 1;
+  padding: 10px;
+  font-size: 13px;
+  font-family: "sans-serif";
+  background: rgb(225, 225, 225);
+  color: #000;
+  border-radius: 8px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+/*.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(200, 220, 245, 0.96);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}*/
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+#controlPanel {
+  position:absolute;
+  z-index: 0;
+  top: 100px;
+  left: 880px;
+  border: 1px solid rgba(0,0,0, 0.3);
+  background-color: rgba(0,0,0, 0.15);
+}
+#usMap {
+ position:absolute;
+ z-index: 0;
+ top: 100px;
+ left: 00px;
+ /*border: 1px solid rgba(0,0,0, 0.3);*/
+ background-color: rgba(0,0,0, 0);
+}
+.state{
+ fill: none;
+ stroke: #a9a9a9;
+ stroke-width: 1;
+}
+.state:hover{
+ fill-opacity:0.5;
+}
+</style>
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<meta name="description" content="FeatureSelector: Variable Selection Using Visual Features of 2D Projections"/>
+<meta name="keywords" content="FeatureSelector,Scagnostics"/> 
+<meta name="author" content="FeatureSelector"/> 
+<link rel="stylesheet" type="text/css" href="styles/default.css" media="screen"/>
+<link rel="shortcut icon" href="styles/FeatureSelector.png">
+
+<title>FeatureSelector</title>
+</head>
+
+<body>
+<h1>Variable Selection Using Visual Features of 2D Projections</h1>
+<h2>EuroVis 2018, Online Submission ID #1030 </h2>
+    <div id="menu">
+      <nav>
+        <ul>
+        <li><a href="index.html"><span style="color:#888">Video<span></a></li>
+        <li><a href="method.html"><span style="color:#888">Method</span></a></li>
+        <li><a href="compare.html"><span style="color:#888">Compare<span></a></li>
+        <li><a href="demos.html"><b><span style="color:#fff">Demo</b><span></a></li>      
+        </ul>
+      </nav>
+    </div>
+<!-- Spinner when loading -->
+<div id="loadingSpinner">
+  <!-- <span id="progressText"> -->
+</div>
+
+<div id="controlPanel"  class="controlPanel">
+<input type="checkbox" id="checkbox1"  onclick="toggleScore()">
+<label for="checkbox1" >Show monotonic scores </label><br><br>
+<input type="radio" id="radio1" name="radioGroup" onclick="" checked> All scatterplots in cluster<br>
+<input type="radio" id="radio2" name="radioGroup" onclick="" > Linked scatterplot<br>
+<input type="radio" id="radio3" name="radioGroup" onclick="" > Scagnostics bar chart<br>
+
+
+</label>
+
+</div>
+<div id ="usMap">
+ <svg id="statesvg" width="0" height="600"></svg>
+</div>
+
+<script src="javascripts/d3.v3.min.js"></script>
+<script src="javascripts/d3.tip.v0.6.3.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script> <!-- Spinner when loading -->
+<script src="js/States.js"></script>
+<script src="js/tooltip.js"></script>
+<script src="js/util.js"></script>
+<script src="js/main.js"></script>
+
+<div class="footer">
+    <span class="right">&copy; Last revised: September 30, 2017</span>
+    <div class="clearer"><span></span></div>
+  </div>
+</div>  
+
+</body>

@@ -69,7 +69,7 @@ h5 {
 #visualizations {
   height: 100%;
   padding:15px;
-  border-radius:25px;
+  border-radius:10px;
   box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
   background:#fff;
 }
@@ -148,7 +148,7 @@ h5 {
 #footer{
 
 /*    width: 100%;*/
-    border-radius:25px;
+    border-radius:10px;
     border: 1px;
     height: 300px;
 }
@@ -167,7 +167,7 @@ h5 {
 #footer3{
  
     width: 100%;
-    border-radius:25px;
+    border-radius:10px;
     border: 1px;
     height: 600px;
 }
@@ -183,7 +183,7 @@ h5 {
 #footerSpace{
     width: 20%;
     position: center;
-    border-radius:25px;
+    border-radius:10px;
     border: 1px;
     height: 50px;
 } 
@@ -191,7 +191,7 @@ h5 {
 #footer4{
     width: 20%;
     position: center;
-    border-radius:25px;
+    border-radius:10px;
     border: 1px;
     height: 50px;
 }
@@ -285,26 +285,26 @@ h5 {
 }
 
 #userList{
-  border: 2px solid #777;
+  border: 1px solid #777;
       min-height: 600px;
-      border-radius:25px;
+      border-radius:10px;
       min-height: 400px;
 }
 
 #map{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
   min-height: 600px;
 }
 #diseaseCloud{
   border-radius:3px;
   float: left;
-  border: 2px solid #777;
+  border: 1px solid #777;
   margin-right: 10px;
 }
 #diseaseStream{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
 }
 #footer{
 
@@ -314,49 +314,43 @@ h5 {
   margin-top: 25px;
 }
 #tagCloud{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
   margin-right: 10px;
   width: 42%;
   min-height: 370px;
-  margin-left: 30px;
   min-height: 370px;
 }
 #timeline{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
   width: 53%;
   min-height: 370px;
 }
 #tagCloud2{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
   margin-right: 10px;
   width: 42%;
   min-height: 370px;
-  margin-left: 30px;
   min-height: 370px;
 }
 #timeline2{
-  border-radius:25px;
-  border: 2px solid #777;
+  border-radius:10px;
+  border: 1px solid #777;
   width: 53%;
   min-height: 370px;
 }
 #network{
-  margin-top: 25px;
+  margin-top: 10px;
   margin-bottom: 50px;
   width: 95.5%;
-  margin-left: 30px;
-
 }
 #container8{
-
-  border-radius:25px;
+  border-radius:10px;
   width: 80%;
-  margin-left: auto;
   margin-right: auto;
-  border: 2px solid #777;
+  border: 1px solid #777;
 }
 h3{
   color: #000;
