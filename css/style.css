@@ -217,7 +217,6 @@ h5 {
 #intervalSlider {
   display: flex;
   width: 90%;
-  margin-left: auto;
   margin-right: auto;
   padding: 1%;
   justify-content: center;
@@ -286,9 +285,9 @@ h5 {
 
 #userList{
   border: 1px solid #777;
-      min-height: 600px;
-      border-radius:10px;
-      min-height: 400px;
+  min-height: 600px;
+  border-radius:10px;
+  min-height: 400px;
 }
 
 #map{
