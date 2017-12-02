@@ -1,0 +1,8 @@
+Micro-blogging and social media data can help in predicting a variety of events and also able to detect the flow and evolution of the events and incidents. In this project, we introduce HealthTVizer - a social media analytics tool, for exploring health awareness using Twitter data through interactive and interconnected multiple views. 
+
+We processed and analyzed over 57 million tweets and pick the tweets related to the diseases using topic modeling. After that, we categorized the tweets in 21 most frequent and discussed diseases on that time frame. This application assist a user in achieving a quick summary about the current diseases along with the geographical location on the United States map. 
+
+HealthTVizer contains coordinated multiple views which highlight different tweet attributes: User ID, geolocation, keywords, time stamp, and the related disease. The key features of HealthTVizer are: Top user list, Diseases map, Diseases cloud, Disease Streamgraph, Keywords cloud, Keywords streamgraph, and Network of Diseases and Keywords. 
+
+
+## When the application load for first time it display the top user from every disease. The top user list represents the users based on the number of tweets about any particular disease type. After clicking on diseases cloud, the list will automatically update with respect to the corresponding disease. On hovering on the user ID or user tweets count bar, a table will pop up displaying the 20 tweets of that particular user.

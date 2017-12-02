@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+<head>
+    <!-- Theme Made By www.w3schools.com - No Copyright -->
+    <title>Text Visualization</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="js/hashtable.js"></script>
+    <link href="css/app.css" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
+        }
+        .legend {
+            border: 1px solid #555555;
+            border-radius: 5px 5px 5px 5px;
+            font-size: 0.8em;
+            margin: 10px;
+            padding: 8px;
+        }
+        .bld {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="row">
+    <div id="top" class="col col-md-6">
+
+    </div>
+
+<div id="secondDiv" class="col col-md-6">
+    <input id="search" type="text"/><button id="btn">Monthly Freq</button>
+    <div id="data" class="col col-md-6">
+        </div>
+</div>
+    </div>
+<script src="js/d3cloud.js"></script>
+<script>
+    var topTerms;
+    var allTerms=new Hashtable();
+
+    $(document).ready(function(){
+        var termsData;
+        d3.json("data/termsfrequency.json", function (data) {
+            var termsData = data;
+            data.forEach(function (d) {
+                allTerms.put(d.term,d.properties)
+            });
+           var temp= allTerms.entries();
+                   temp.sort(function (a,b) {
+               return b[1].frequency-a[1].frequency;
+            })
+            temp.slice(0,49).forEach(function (d){
+               $("#top") .append(d[0]+" : "+d[1].frequency+"</br>")
+            } )
+
+
+        });
+
+        $('#btn').click(function () {
+            var term=$('#search').val();
+            $("#data").empty();
+            var rel = getMonthFreq(term);
+            rel.forEach(function (d) {
+                $("#data").append(d.month.toString()+" : "+d.freq.toString() + "</br>");
+            })
+        } )
+    })
+    function getMonthFreq(term) {
+        var termDetails = allTerms.get(term);
+        var result = [];
+        var Months = termDetails.monthfreq;
+        $("#data").append("Total Frequency " + termDetails.frequency + "</br>");
+        Months.forEach(function (d) {
+            result.push({ "month": d.month, "freq": d.freq })
+        });
+        return result;
+    }
+
+</script>
+
+</body>
+</html>
+
+
+

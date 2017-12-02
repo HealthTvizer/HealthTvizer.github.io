@@ -1,0 +1,1797 @@
+<meta charset="utf-8">
+
+
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://d3js.org/d3.v3.js"></script>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+  <script src="datamaps.usa.min.js"></script>
+  <script src="colorbrewer.v1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/hashtable.js"></script>
+  <script src="js/d3cloud.js"></script>
+  <script src="js/d3-tooltip.js"></script>
+  <script src="js/terms-generator.js"></script>
+  <script src="js/cmatrix.js"></script>
+  <script src="legend.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/app.css">
+  
+  <link rel="stylesheet" type="text/css" href="style.css">
+  
+</head>
+
+<body>
+
+  
+<div id="footer3">
+  <div id="footer4"> </div>
+  <div id="container" ></div>
+</div>
+    
+<div id="footer">
+    <div id="tagCloud" runat="server"></div>
+    <div id="timeline" runat="server"></div>
+       
+</div>
+
+<div id="footer2">
+    <div id="tagCloud2" runat="server"></div>
+    <div id="timeline2" runat="server"></div>
+       
+</div>
+
+
+
+
+
+
+<script>
+  var source = "wn";
+  var topTermsCount = 50;
+  var topTerms2;
+
+  // stream graph variables declared globally to keep the scope for update
+  var stack;
+  var startDate;
+  var endDate;
+  var area;
+  var line;
+  var layers;
+  var timeline;
+  var timeline2;
+  var defs;
+  var timelineX
+  var timelineY;
+  var xAxis, yAxis;
+  var catcolors = [];
+  var streamColor = d3.scale.category20();
+  // Method for creating stack layout.
+  stack = d3.layout.stack().offset("silhouette")
+          .values(function (d) {
+            return d.monthfreq;
+          })
+          .x(function (d) {
+            return d.month;
+          })
+          .y(function (d) {
+            return d.freq;
+          });
+
+  //Mouse click delay variables
+  var DELAY = 300, clicks = 0, timer = null;
+
+  // An array of dates in which all frequencies are zero. Used to hide a term
+  // in the streamgraph (as opposed to completely deleting it).
+  var zeroSeries = [{freq: 0, month: endDate}];
+  zeroSeries = fillData(zeroSeries, startDate, endDate);
+
+  //cloud svg width and height
+  var cloudWidth1 = $("#tagCloud").width();
+  var cloudWidth2 = $("#tagCloud2").width();
+  var cloudHeight = 300;
+  var svg = d3.select("#tagCloud").append("svg")
+          .attr("width", cloudWidth1)
+          .attr("height", cloudHeight)
+          .append("g")
+          .attr("transform", "translate(" + cloudWidth1 / 2 + "," + cloudHeight / 2 + ")");
+
+  var svg2 = d3.select("#tagCloud2").append("svg")
+          .attr("width", cloudWidth2)
+          .attr("height", cloudHeight)
+          .append("g")
+          .attr("transform", "translate(" + cloudWidth2 / 2 + "," + cloudHeight / 2 + ")");
+
+  /* Initialize tooltip */
+  var wordTip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function (d) {
+            return "<strong>" + d.text + " :" + d.frequency + "</strong>";
+          });
+  svg.call(wordTip);
+  var cloudmessages = svg.append("p")
+          .attr("class", "messages")
+          .attr("transform", "translate(10, 10)")
+          .html("Updating...");
+  var parse = d3.time.format("%Y %m %d %H");
+  var start = parse.parse("2017 01 01 00");
+  var end = parse.parse("2017 02 01 00");
+  // var topTerms;
+  var wnrawdata = [];
+  var hprawdata = [];
+  var myWordCloud;
+  var myWordCloud2;
+  var fill = d3.scale.category20();
+  var personcolor = [];
+  var misccolor = [];
+  var orgcolor = [];
+  var locationcolor = [];
+  var color1 = d3.hsl("#cdf6d2");
+  var brush;
+  var sizeScale = d3.scale.linear()
+          .range([5, 80]);
+  $(document).ready(function () {
+    var termsData;
+    //Create a new instance of the word cloud visualisation.
+    myWordCloud = wordCloud('#tagCloud');
+    myWordCloud2 = wordCloud2('#tagCloud2');
+//    loadData("data/wikinews.tsv", "wn")
+      loadData("data/diseaseData.csv", "wn")
+      // loadDataUpdate("data/diseaseData.csv", "wn", "cancer");
+//      loadData("data/huffington.tsv", "wn")
+//      loadData("data/americablog.tsv", "wn")
+  });
+
+
+  function loadData(filename, source) {
+   
+    var data = preProcessData();
+      // console.log(data);
+     var data2 = preProcessData2();
+    // console.log(data2);
+    data.startProcess(filename, function (data) {
+      // console.log(data)
+    var localallTermsArray = [];
+    var localallTermsMap;
+      cloudmessages.attr("opacity", 1);
+      localallTermsMap = data;
+      var monthly = [];
+      var currmonth;
+      for (var term in data) {
+        // console.log(data)
+        monthly = []
+        var entry = {};
+        entry.term = term;
+        entry.values = {};
+        for (var val in data[term]) {
+          if (val == "frequency") {
+            entry.values.frequency = data[term][val];
+          }
+          else if (val == "category") {
+            entry.values.category = data[term][val];
+          }
+          else {
+            currmonth = parse.parse(val);
+            monthly.push({
+              "month": currmonth,
+              "freq": data[term][val].freq,
+              "blogs": data[term][val].blogs
+            })
+          }
+        }
+        entry.values.monthfreq = monthly;
+
+
+        localallTermsArray.push(entry)
+      }
+      // console.log(localallTermsArray);
+      // debugger;
+
+        wnallTermsArray = localallTermsArray;
+        wnallTermsMap = localallTermsMap;
+        allTermsArray = wnallTermsArray;
+        allTermsMap = wnallTermsMap
+        topTerms = getTopTerms(allTermsArray);
+        showNewWords(myWordCloud, topTerms);
+        //Set stream graph, topterms.monthfreq contains monthly frequency
+        setStreamGraph(topTerms);
+       cloudmessages.attr("opacity", 0);
+
+    });
+  data2.startProcess2(filename, function (data) {
+           var localallTermsArray = [];
+    var localallTermsMap;
+      // console.log(data)
+      cloudmessages.attr("opacity", 1);
+      localallTermsMap = data;
+      var monthly = [];
+      var currmonth;
+      for (var term in data) {
+        monthly = []
+        var entry = {};
+        entry.term = term;
+        entry.values = {};
+        for (var val in data[term]) {
+          if (val == "frequency") {
+            entry.values.frequency = data[term][val];
+          }
+          else if (val == "category") {
+            entry.values.category = data[term][val];
+          }
+          else {
+            currmonth = parse.parse(val);
+            monthly.push({
+              "month": currmonth,
+              "freq": data[term][val].freq,
+              "blogs": data[term][val].blogs
+            })
+          }
+        }
+        entry.values.monthfreq = monthly;
+
+
+        localallTermsArray.push(entry)
+      }
+
+        wnallTermsArray = localallTermsArray;
+        wnallTermsMap = localallTermsMap;
+        var allTermsArray = wnallTermsArray;
+        allTermsMap = wnallTermsMap
+        topTerms2 = getTopTerms(allTermsArray);
+        showNewWords2(myWordCloud2, topTerms2);
+        //Set stream graph, topterms.monthfreq contains monthly frequency
+        setStreamGraph2(topTerms2);
+       cloudmessages.attr("opacity", 0);
+
+    });
+  
+  }
+
+    function loadDataUpdate(filename, source, dName) {
+     var data3 = preProcessData3(dName);
+    // console.log(data3);
+  data3.startProcess3(filename, function (data) {
+           var localallTermsArray = [];
+    var localallTermsMap;
+      // console.log(data)
+      cloudmessages.attr("opacity", 1);
+      localallTermsMap = data;
+      var monthly = [];
+      var currmonth;
+      for (var term in data) {
+        monthly = []
+        var entry = {};
+        entry.term = term;
+        entry.values = {};
+        for (var val in data[term]) {
+          if (val == "frequency") {
+            entry.values.frequency = data[term][val];
+          }
+          else if (val == "category") {
+            entry.values.category = data[term][val];
+          }
+          else {
+            currmonth = parse.parse(val);
+            monthly.push({
+              "month": currmonth,
+              "freq": data[term][val].freq,
+              "blogs": data[term][val].blogs
+            })
+          }
+        }
+        entry.values.monthfreq = monthly;
+
+
+        localallTermsArray.push(entry)
+      }
+
+        wnallTermsArray = localallTermsArray;
+        wnallTermsMap = localallTermsMap;
+        var allTermsArray = wnallTermsArray;
+        allTermsMap = wnallTermsMap
+        var topTerms3 = getTopTerms(allTermsArray);
+        updateStreamGraph(topTerms3, false);
+        showNewWords2(myWordCloud2, topTerms3);
+        //Set stream graph, topterms.monthfreq contains monthly frequency
+        // setStreamGraph2(topTerms3);
+        
+       cloudmessages.attr("opacity", 0);
+
+    });
+  
+  }
+
+  //getTopTerms based on start and end dates
+  function getTopTerms(allTermsArray) {
+    var monthlyData = [];
+    var currmonth;
+    var blogs = [];
+    var monthfreq = [];
+// console.log(allTermsArray);
+    allTermsArray.forEach(function (d, i) {
+      var months = d.values.monthfreq;
+      var freq = 0;
+      blogs = [];
+      monthfreq = [];
+      for (var i = 0; i < months.length; i++) {
+        currmonth = months[i].month;
+        if (currmonth >= start && currmonth <= end) {
+          freq = freq + months[i].freq;
+
+          months[i].blogs.forEach(function (b) {
+            blogs.push(b);
+
+          })
+          monthfreq.push(months[i]);
+        }
+      }
+      if (freq > 0)
+
+        monthlyData.push({
+          "term": d.term,
+          "freq": freq,
+          "blogs": blogs,
+          "monthfreq": monthfreq,
+          "category": d.values.category
+        });
+    });
+
+    monthlyData.sort(function (a, b) {
+      return b.freq - a.freq;
+    })
+    //
+    //get top 50 terms
+    topTerms = monthlyData.slice(0, topTermsCount)
+    //sort by month
+    topTerms.forEach(function (currterm) {
+      currterm.monthfreq.sort(function (a, b) {
+        return a.month - b.month;
+      })
+    })
+
+    topTerms.sort(function (a, b) {
+      if (a.category == b.category) {
+        return (a.freq < b.freq) ? -1 : (a.freq > b.freq) ? 1 : 0;
+      }
+      else {
+        return (a.category < b.category) ? -1 : 1;
+      }
+    });
+
+    personcolor = [];
+    locationcolor = [];
+    misccolor = [];
+    orgcolor = [];
+    var personcount = 0;
+    var locationcount = 0;
+    var misccount = 0;
+    var orgcount = 0;
+    for (var i = 0; i < topTerms.length; i++) {
+      var cat = topTerms[i].category;
+      if (cat == "Person")
+        personcount++
+      else if (cat == "Location")
+        locationcount++
+      else if (cat == "Misc")
+        misccount++
+      else if (cat == "Organization")
+        orgcount++
+    }
+    var currpersinc = 0.1;
+    var currlocinc = 0.1;
+    var currmiscinc = 0.1;
+    var currorginc = 0.1;
+    var colorP = d3.hsl("#d62728");
+    var colorM = d3.hsl("#ff7f0e");
+    var colorO = d3.hsl("#1f77b4");
+    var colorL = d3.hsl("#008400");
+    var persinc = 1 / personcount;
+    var locinc = 1 / locationcount;
+    var miscinc = 1 / misccount;
+    var orginc = 1 / orgcount;
+    for (var i = 0; i < topTerms.length; i++) {
+      var cat = topTerms[i].category;
+      if (cat == "Person") {
+        currpersinc = currpersinc + persinc;
+        personcolor[topTerms[i].term] = colorP.darker(currpersinc)
+      }
+    }
+
+     // console.log(topTerms);
+     // debugger;
+    return topTerms;
+  }
+
+  function minDate(data) {
+    return d3.min(data, function (d) {
+      var localMin = d3.min(d.monthfreq, function (d) {
+        return d.month;
+      });
+      return localMin;
+    });
+  }
+
+  function maxDate(data) {
+    return d3.max(data, function (d) {
+      var localMax = d3.max(d.monthfreq, function (d) {
+        return d.month;
+      });
+      return localMax;
+    });
+  }
+
+  function showNewWords(vis, words) {
+
+
+    vis.update(words)
+  }
+function showNewWords2(vis, words) {
+    vis.update(words)
+  }
+  // Encapsulate the word cloud functionality
+
+  var clickTerms = "a";
+  var clickNo = 0;
+  function wordCloud(selector) {
+
+    //Draw the word cloud
+    function draw(words) {
+      // console.log(words);
+       words.sort(function(a, b) {
+      return a.frequency -b.frequency;
+    });
+      var cloud = svg.selectAll("g text")
+              .data(words, function (d) {
+                return d.text;
+              })
+
+      mappingDiseaseNameColor = {diseaseName: '', color : ''};
+      mapList = []
+      k = 0;
+      
+      //Entering words
+      cloud.enter().append("text")
+              .style("font-size", function (d) {
+                return d.size + "px";
+              })
+              .style("font-family", "Impact")
+              .style("fill", function (d, i) {
+                 mapList[i] = {diseaseName: d.text, color: streamColor(i)};
+                 return streamColor(i);
+
+              })
+              .style("cursor", "pointer")
+              .style("pointer-events", "all")
+              .attr("text-anchor", "middle")
+              .attr("transform", function (d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .attr("class", "cloud-terms")
+              .text(function (d) {
+                return d.text;
+              })
+              .on("mousemove", function (d) {
+                //  d3.select(this).attr("opacity", "0.6");
+                wordTip.show(d, this);
+                // highlightLayer({term: d.text});
+              })
+               .on("mouseover", function (d) {
+                 // console.log(d);
+                 // loadDataUpdate("data/diseaseData.csv", "wn", d.text);
+              })
+
+              .on("mouseout", function (d) {
+                // d3.select(this).attr("opacity", "1");
+                wordTip.hide();
+                
+                // loadDataUpdate("data/diseaseData.csv", "wn", "all");
+                  // showNewWords2(myWordCloud2, topTerms2);
+        //Set stream graph, topterms.monthfreq contains monthly frequency
+                  // updateStreamGraph(topTerms2, false);
+              })
+              //handle single and double clicks
+              .on("click", function (d) {
+                  // console.log(d);
+                  diseaseNameMap = d.text;
+                  for(i = 0 ; i < mapList.length; i++){
+                    if(mapList[i].diseaseName == diseaseNameMap)
+                      mapColor = mapList[i].color;
+                  }
+                  // debugger;
+                  showMap(diseaseNameMap,mapColor)
+
+
+                  // svg.selectAll(".cloud-terms")
+                  //           .style("background-color", function (d1, i) {
+                  //             if (d.text == d1.text)
+                  //               d1.active = !d1.active;
+                  //             if (d1.active == undefined || d1.active == false)
+                  //               return "black";
+                  //             else
+                  //               return streamColor(i);
+                  //           })
+                  // highlightLayer(d);
+                  // highlightWord(d);
+                  if(clickNo==0){
+                   highlightLayer({term: d.text});
+                   highlightWord(d);
+                   loadDataUpdate("data/diseaseData.csv", "wn", d.text);
+                   clickNo = 1;
+                 }
+                 else
+                 {
+                  unhighlightLayer();
+                  unHighlightWord();
+                  clickNo = 0;
+                 }
+              })
+
+      //Entering and existing words
+      cloud.transition()
+              .duration(100)
+              .style("font-size", function (d) {
+                return d.size + "px";
+              })
+              .attr("transform", function (d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .style("fill-opacity", 1);
+
+      //Exiting words
+      cloud.exit()
+              .transition()
+              .duration(100)
+              .style('fill-opacity', 1e-6)
+              .attr('font-size', 1)
+              .remove();
+
+    }
+
+
+    return {
+      update: function (words) {
+        var newHighRange;
+        
+          newHighRange = 70;
+      
+        sizeScale.domain([d3.min(words, function (d) {
+          return d.freq
+        }), d3.max(words, function (d) {
+          return d.freq
+        })])
+
+        var newLowRange = Math.floor((newHighRange) / words.length) + 9;
+        sizeScale.range([newLowRange, newHighRange]);
+
+
+        d3.layout.cloud().size([cloudWidth1, cloudHeight])
+                .timeInterval(Infinity)
+                .words(words.map(function (d) {
+                  return {text: d.term, size: sizeScale(d.freq), frequency: d.freq, active: true, category: d.category};
+                }))
+                .padding(3)
+                .rotate(function () {
+                  return ~~(Math.random() * 2) * 90;
+                })
+                .font("Impact")
+                .fontSize(function (d) {
+                  return d.size
+                })
+                .on("end", draw)
+                .start();
+      }
+    }
+  }
+    function wordCloud2(selector) {
+
+    //Draw the word cloud
+    function draw(words) {
+      // console.log(words);
+       words.sort(function(a, b) {
+      return a.frequency -b.frequency;
+    });
+      var cloud = svg2.selectAll("g text")
+              .data(words, function (d) {
+                return d.text;
+              })
+
+      //Entering words
+      cloud.enter().append("text")
+              .style("font-size", function (d) {
+                return d.size + "px";
+              })
+              .style("font-family", "Impact")
+              .style("fill", function (d, i) {
+                 return streamColor(i);
+              })
+              .style("cursor", "pointer")
+              .style("pointer-events", "all")
+              .attr("text-anchor", "middle")
+              .attr("transform", function (d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .attr("class", "cloud-terms")
+              .text(function (d) {
+                return d.text;
+              })
+              .on("mousemove", function (d) {
+                //  d3.select(this).attr("opacity", "0.6");
+                wordTip.show(d, this);
+                highlightLayer2({term: d.text});
+              })
+              .on("mouseout", function (d) {
+                d3.select(this).attr("opacity", "1");
+                wordTip.hide();
+                unhighlightLayer2();
+              })
+              //handle single and double clicks
+              .on("click", function (d) {
+                  // console.log(d);
+              })
+
+
+      //Entering and existing words
+      cloud.transition()
+              .duration(100)
+              .style("font-size", function (d) {
+                return d.size + "px";
+              })
+              .attr("transform", function (d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .style("fill-opacity", 1);
+
+      //Exiting words
+      cloud.exit()
+              .transition()
+              .duration(100)
+              .style('fill-opacity', 1e-6)
+              .attr('font-size', 1)
+              .remove();
+
+    }
+
+
+    return {
+      update: function (words) {
+        var newHighRange;
+        
+          newHighRange = 70;
+      
+        sizeScale.domain([d3.min(words, function (d) {
+          return d.freq
+        }), d3.max(words, function (d) {
+          return d.freq
+        })])
+
+        var newLowRange = Math.floor((newHighRange) / words.length) + 9;
+        sizeScale.range([newLowRange, newHighRange]);
+
+
+        d3.layout.cloud().size([cloudWidth2, cloudHeight])
+                .timeInterval(Infinity)
+                .words(words.map(function (d) {
+                  return {text: d.term, size: sizeScale(d.freq), frequency: d.freq, active: true, category: d.category};
+                }))
+                .padding(3)
+                .rotate(function () {
+                  return ~~(Math.random() * 2) * 90;
+                })
+                .font("Impact")
+                .fontSize(function (d) {
+                  return d.size
+                })
+                .on("end", draw)
+                .start();
+      }
+    }
+  }
+
+
+
+  // function updateVisualization() {
+
+  //   $("#range").text(start.getMonth() + " " + start.getFullYear() + " TO " + end.getMonth() + " " + end.getFullYear());
+  //   topTerms = getTopTerms(allTermsArray);
+  //   showNewWords(myWordCloud, topTerms);
+  //   //update stream graph, topterms.monthfreq contains monthly frequency
+  //   updateStreamGraph(topTerms, false);
+  //   if ($("#relationships").is(":checked")) {
+  //     $("#tagCloud").removeClass("active").addClass("inactive");
+  //     $("#relationshipChart").addClass("active").removeClass("inactive");
+  //     plotRelations()
+  //   } else {
+  //     $("#tagCloud").addClass("active").removeClass("inactive");
+  //     $("#relationshipChart").removeClass("active").addClass("inactive");
+  //   }
+  // }
+
+  function setStreamGraph(topTerms) {
+    // TODO(manorepo): Remove below comment.
+    // stream code change - Moved the sub functions out of this function to make available for update.
+
+    startDate = maxDate(topTerms);
+
+    endDate = minDate(topTerms);
+
+    topTerms.forEach(function (d) {
+      d.monthfreq = fillData(d.monthfreq, startDate, endDate);
+    });
+
+    zeroSeries = [{freq: 0, month: endDate}];
+    zeroSeries = fillData(zeroSeries, startDate, endDate);
+
+    // Define dimensions.
+    var margin = {top: 20, right: 0, bottom: 30, left: 40};
+    var svgWidth = $("#timeline").width()
+    var svgHeight = 300;
+    var width = svgWidth * 0.98 - margin.left - margin.right;
+    var height = svgHeight - margin.bottom - margin.top;
+
+    // Define scales.
+    timelineX = d3.time.scale()
+            .range([0, width]);
+
+    timelineY = d3.scale.linear()
+            .range([height, 0]);
+
+    // Define axes.
+    xAxis = d3.svg.axis()
+            .scale(timelineX)
+            .orient("bottom")
+            .ticks(15)
+            .tickFormat(d3.time.format("%b %d"));
+
+    yAxis = d3.svg.axis()
+            .scale(timelineY)
+            .orient("left")
+            .ticks(7);
+
+    // Define stacked areas and lines that separate the areas.
+    area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function (d) {
+              return timelineX(d.month);
+            })
+            .y0(function (d) {
+                return timelineY(d.y0);
+            })
+            .y1(function (d) {
+              return timelineY(d.y0+ d.y);
+            });
+
+    line = d3.svg.line()
+            .interpolate("cardinal")
+            .x(function (d) {
+               // console.log(d.month)
+              return timelineX(d.month);
+            })
+            .y(function (d) {
+              return timelineY(d.y0);
+            });
+
+    // TODO: Sort topTerms by category.
+    topTerms.sort(function(a, b) {
+      return a.freq - b.freq;
+    });
+// console.log(topTerms);
+    layers = stack(topTerms);
+
+    timelineX.domain([endDate, startDate]);
+    timelineY.domain([0, d3.max(layers, function (d) {
+      var localMax = d3.max(d.monthfreq, function (d) {
+        return d.y0 + d.y;
+      });
+      return localMax;
+    })]);
+
+    timeline = d3.select("#timeline").append("svg")
+            .attr("width", svgWidth)
+            .attr("height", svgHeight)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Define a clip path to prevent the graph from going out of its region on zoom.
+    defs = timeline.append("defs");
+    defs.append("clipPath")
+            .attr("id", "sideClip")
+            .append("rect")
+            .attr("transform", "translate(0,-" + margin.top + ")")
+            .attr("width", width)
+            .attr("height", height + margin.top);
+
+    // Stacked layers.
+    timeline.selectAll(".layer")
+            .data(layers)
+            .enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layer")
+            .call(updateLayer)
+            .on("mouseover", function (d) {
+              highlightLayer(d);
+              highlightWord(d);
+            })
+            .on("mouseout", function () {
+              unhighlightLayer();
+              unHighlightWord();
+            });
+
+    // Lines separating stacked layers.
+    timeline.selectAll(".layerLine")
+            .data(layers)
+            .enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layerLine")
+            .call(updateLayerLine);
+
+    // Add axes.
+    timeline.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+    timeline.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+    timeline.append("text")
+        .attr("transform","rotate(-90)")
+        .attr("y",0 - margin.left-4)
+        .attr("x",0 - (height / 2))
+        .attr("dy","1em")
+        .style("text-anchor","middle")
+        .text("frequency");
+    timeline.append("text")
+        .attr("transform", "translate(" + (width / 2) + " ," + (height+margin.bottom) + ")")
+        .style("text-anchor", "middle")
+        .text("Date")
+        .attr("class", "axis-label")
+
+    // Create legend.
+    var legend = timeline.append("g")
+        .attr("transform", "translate(" + (width - 100) + "," + (-margin.top + 2) + ")")
+        .style("fill", "rgb(255, 142, 44)");
+
+    var categoryColors = [
+      { category: "Person", color: "#d62728" },
+        { category: "Location", color: "rgb(44, 160, 44)" },
+      { category: "Organization", color: "#1f77b4" },
+      { category: "Miscellaneous", color: "#ff7f0e" }
+    ];
+
+
+
+  }
+
+    function setStreamGraph2(topTerms) {
+    // TODO(manorepo): Remove below comment.
+    // stream code change - Moved the sub functions out of this function to make available for update.
+
+    startDate = maxDate(topTerms);
+
+    endDate = minDate(topTerms);
+
+    topTerms.forEach(function (d) {
+      d.monthfreq = fillData(d.monthfreq, startDate, endDate);
+    });
+
+    zeroSeries = [{freq: 0, month: endDate}];
+    zeroSeries = fillData(zeroSeries, startDate, endDate);
+
+    // Define dimensions.
+    var margin = {top: 20, right: 0, bottom: 30, left: 40};
+    var svgWidth = $("#timeline2").width();
+    var svgHeight = 300;
+    var width = svgWidth * 0.98 - margin.left - margin.right;
+    var height = svgHeight - margin.bottom - margin.top;
+
+    // Define scales.
+    timelineX = d3.time.scale()
+            .range([0, width]);
+
+    timelineY = d3.scale.linear()
+            .range([height, 0]);
+
+    // Define axes.
+    xAxis = d3.svg.axis()
+            .scale(timelineX)
+            .orient("bottom")
+            .ticks(15)
+            .tickFormat(d3.time.format("%b %d"));
+
+    yAxis = d3.svg.axis()
+            .scale(timelineY)
+            .orient("left")
+            .ticks(7);
+
+    // Define stacked areas and lines that separate the areas.
+    area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function (d) {
+              return timelineX(d.month);
+            })
+            .y0(function (d) {
+                return timelineY(d.y0);
+            })
+            .y1(function (d) {
+              return timelineY(d.y0+ d.y);
+            });
+
+    line = d3.svg.line()
+            .interpolate("cardinal")
+            .x(function (d) {
+               // console.log(d.month)
+              return timelineX(d.month);
+            })
+            .y(function (d) {
+              return timelineY(d.y0);
+            });
+
+    // TODO: Sort topTerms by category.
+    topTerms.sort(function(a, b) {
+      return a.freq - b.freq;
+    });
+// console.log(topTerms);
+    layers = stack(topTerms);
+
+    timelineX.domain([endDate, startDate]);
+    timelineY.domain([0, d3.max(layers, function (d) {
+      var localMax = d3.max(d.monthfreq, function (d) {
+        return d.y0 + d.y;
+      });
+      return localMax;
+    })]);
+
+    timeline2 = d3.select("#timeline2").append("svg")
+            .attr("width", svgWidth)
+            .attr("height", svgHeight)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Define a clip path to prevent the graph from going out of its region on zoom.
+    defs = timeline2.append("defs");
+    defs.append("clipPath")
+            .attr("id", "sideClip")
+            .append("rect")
+            .attr("transform", "translate(0,-" + margin.top + ")")
+            .attr("width", width)
+            .attr("height", height + margin.top);
+
+    // Stacked layers.
+    timeline2.selectAll(".layer")
+            .data(layers)
+            .enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layer")
+            .call(updateLayer)
+            .on("mouseover", function (d) {
+              highlightLayer2(d);
+              highlightWord2(d);
+            })
+            .on("mouseout", function () {
+              unhighlightLayer2();
+              unHighlightWord2();
+            });
+
+    // Lines separating stacked layers.
+    timeline2.selectAll(".layerLine")
+            .data(layers)
+            .enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layerLine")
+            .call(updateLayerLine);
+
+    // Add axes.
+    timeline2.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+    timeline2.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+    timeline2.append("text")
+        .attr("transform","rotate(-90)")
+        .attr("y",0 - margin.left-4)
+        .attr("x",0 - (height / 2))
+        .attr("dy","1em")
+        .style("text-anchor","middle")
+        .text("frequency");
+    timeline2.append("text")
+        .attr("transform", "translate(" + (width / 2) + " ," + (height+margin.bottom) + ")")
+        .style("text-anchor", "middle")
+        .text("Date")
+        .attr("class", "axis-label")
+
+    // Create legend.
+    var legend = timeline2.append("g")
+        .attr("transform", "translate(" + (width - 100) + "," + (-margin.top + 2) + ")")
+        .style("fill", "rgb(255, 142, 44)");
+
+    var categoryColors = [
+      { category: "Person", color: "#d62728" },
+        { category: "Location", color: "rgb(44, 160, 44)" },
+      { category: "Organization", color: "#1f77b4" },
+      { category: "Miscellaneous", color: "#ff7f0e" }
+    ];
+
+
+
+  }
+
+  // Fills in missing dates in 'data'. 'data' must be non-empty.
+  // Assumes that 'data' is sorted by date in chronological order.
+  function fillData(data, endDate, startDate) {
+    var d = [],
+            len = data.length,
+            now = new Date(startDate),
+            last = new Date(endDate),
+            iterator = 0,
+            y;
+
+    while (now <= last) {
+      y = 0;
+      try {
+        // stream code change - changed logic as the data has months in ascending order
+        if (iterator < len && now.getTime() == new Date(data[iterator].month).getTime()) {
+          y = data[iterator].freq;
+          ++iterator;
+        }
+      }
+      catch (exc) {
+        // console.log(iterator);
+        debugger;
+      }
+      d.push({"month": new Date(now), "freq": y});
+       now["setHours"](now.getHours() + 1);
+    }
+
+    return d;
+  }
+
+  function updateStreamGraph(topTerms, hasTransition) {
+    // console.log("here");
+    startDate = maxDate(topTerms);
+
+    endDate = minDate(topTerms);
+
+    topTerms.forEach(function (d) {
+      d.monthfreq = fillData(d.monthfreq, startDate, endDate);
+    });
+
+    layers = stack(topTerms);
+    stack = stack.offset("silhouette");
+    
+    timelineX.domain([endDate, startDate]);
+    timelineY.domain([0, d3.max(layers, function (d) {
+      var localMax = d3.max(d.monthfreq, function (d) {
+        return d.y0 + d.y;
+      });
+      return localMax;
+    })]);
+
+        // TODO: Sort topTerms by category.
+    topTerms.sort(function(a, b) {
+      return a.freq - b.freq;
+    });
+    // Stacked layers.
+    var stackLayers = timeline2.selectAll(".layer")
+            .data(layers);
+    stackLayers.enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layer")
+            .call(updateLayer)
+            .on("mouseover", function (d) {
+              highlightLayer(d);
+              highlightWord(d);
+            })
+            .on("mouseout", function () {
+              unhighlightLayer();
+              unHighlightWord();
+            });
+
+    // Lines separating stacked layers.
+    var layerLines = timeline2.selectAll(".layerLine")
+            .data(layers);
+    layerLines.enter().append("path")
+            .attr("clip-path", "url(#sideClip)")
+            .attr("class", "layerLine")
+            .call(updateLayerLine);
+
+    if (hasTransition) {
+      timeline2.selectAll(".layer")
+              .transition()
+              .call(updateLayer);
+
+      timeline2.selectAll(".layerLine")
+              .transition()
+              .call(updateLayerLine);
+    } else {
+      timeline2.selectAll(".layer")
+              .call(updateLayer);
+
+      timeline2.selectAll(".layerLine")
+              .call(updateLayerLine);
+    }
+
+    // Remove layers that should no longer be there.
+    stackLayers.exit().remove();
+    layerLines.exit().remove();
+
+    // Add axes.
+
+    timeline2.select(".x.axis")
+            .call(xAxis);
+
+    timeline2.select(".y.axis")
+            .call(yAxis);
+
+  }
+
+  // Updates the stacked layers with their current data.
+  function updateLayer() {
+    this.attr("d", function (d) {
+      return area(d.monthfreq);
+    })
+            .style("fill", function (d, i) {
+              return streamColor(i);
+            });
+  }
+
+  // Updates the lines with their current data.
+  function updateLayerLine() {
+    this.attr("d", function (d) {
+      return line(d.monthfreq);
+    });
+  }
+
+  function highlightLayer(d) {
+    timeline.selectAll(".layer")
+            .attr("opacity", function (d1) {
+              if (d.term == d1.term) {
+                return "1";
+              } else {
+                return "0.2";
+              }
+            });
+    timeline.selectAll(".layerLine")
+            .attr("opacity", function (d1) {
+              if (d.term == d1.term) {
+                return "1";
+              } else {
+                return "0.2";
+              }
+            });
+  }
+    function highlightLayer2(d) {
+    timeline2.selectAll(".layer")
+            .attr("opacity", function (d1) {
+              if (d.term == d1.term) {
+                return "1";
+              } else {
+                return "0.2";
+              }
+            });
+    timeline2.selectAll(".layerLine")
+            .attr("opacity", function (d1) {
+              if (d.term == d1.term) {
+                return "1";
+              } else {
+                return "0.2";
+              }
+            });
+  }
+
+  function highlightWord(d) {
+    var cloudText = svg.selectAll("g text")
+            .each(function (d1) {
+              var currentText = d3.select(this);
+              if (d1.text == d.term) {
+                wordTip.show(d1, this);
+                currentText.attr("opacity", "1");
+              } else {
+                currentText.attr("opacity", "0.1");
+              }
+            });
+    if ($("#relationshipChart").hasClass("active")) {
+      wordTip.hide();
+
+      container.selectAll("path.chord").style("opacity", function (p) {
+        // COMPARE CHORD IDS
+        return (p.source._id === d.term || p.target._id == d.term) ? 1 : 0.1;
+
+
+      });
+      container.selectAll(".group").select("path").style("opacity", function (p) {
+        if (p._id == d.term)
+          return 1
+        else
+          return 0.1
+
+      });
+
+    }
+  }
+    function highlightWord(d) {
+    var cloudText = svg.selectAll("g text")
+            .each(function (d1) {
+              var currentText = d3.select(this);
+              if (d1.text == d.text) {
+                wordTip.show(d1, this);
+                currentText.attr("opacity", "1");
+              } else {
+                currentText.attr("opacity", "0.1");
+              }
+            });
+    if ($("#relationshipChart").hasClass("active")) {
+      wordTip.hide();
+
+      container.selectAll("path.chord").style("opacity", function (p) {
+        // COMPARE CHORD IDS
+        return (p.source._id === d.term || p.target._id == d.term) ? 1 : 0.1;
+
+
+      });
+      container.selectAll(".group").select("path").style("opacity", function (p) {
+        if (p._id == d.term)
+          return 1
+        else
+          return 0.1
+
+      });
+
+    }
+  }
+    function highlightWord2(d) {
+    var cloudText = svg2.selectAll("g text")
+            .each(function (d1) {
+              var currentText = d3.select(this);
+              if (d1.text == d.term) {
+                wordTip.show(d1, this);
+                currentText.attr("opacity", "1");
+              } else {
+                currentText.attr("opacity", "0.1");
+              }
+            });
+    if ($("#relationshipChart").hasClass("active")) {
+      wordTip.hide();
+
+      container.selectAll("path.chord").style("opacity", function (p) {
+        // COMPARE CHORD IDS
+        return (p.source._id === d.term || p.target._id == d.term) ? 1 : 0.1;
+
+
+      });
+      container.selectAll(".group").select("path").style("opacity", function (p) {
+        if (p._id == d.term)
+          return 1
+        else
+          return 0.1
+
+      });
+
+    }
+  }
+
+  function unHighlightWord() {
+    svg.selectAll("g text")
+            .attr("opacity", "1")
+            .call(wordTip.hide);
+    if ($("#relationshipChart").hasClass("active")) {
+
+      container.selectAll("path.chord").style("opacity", function (p) {
+        // COMPARE CHORD IDS
+        return 1;
+
+
+      });
+      container.selectAll(".group").select("path").style("opacity", function (p) {
+        return 1;
+
+      });
+
+    }
+  }
+  function unHighlightWord2() {
+    svg2.selectAll("g text")
+            .attr("opacity", "1")
+            .call(wordTip.hide);
+    if ($("#relationshipChart").hasClass("active")) {
+
+      container.selectAll("path.chord").style("opacity", function (p) {
+        // COMPARE CHORD IDS
+        return 1;
+
+
+      });
+      container.selectAll(".group").select("path").style("opacity", function (p) {
+        return 1;
+
+      });
+
+    }
+  }
+  function unhighlightLayer() {
+    timeline.selectAll(".layer")
+            .attr("opacity", "1");
+    timeline.selectAll(".layerLine")
+            .attr("opacity", "1");
+  }
+    function unhighlightLayer2() {
+    timeline2.selectAll(".layer")
+            .attr("opacity", "1");
+    timeline2.selectAll(".layerLine")
+            .attr("opacity", "1");
+  }
+  function getColor(category, term) {
+    if (category == "Person")
+      return personcolor[term];
+    else if (category == "Misc")
+      return misccolor[term];
+    else if (category == "Location")
+      return locationcolor[term];
+    else if (category == "Organization")
+      return orgcolor[term];
+    else
+      return fill(i);
+  }
+
+
+
+///Map
+function dedupe(arr) {
+  return arr.reduce(function (p, c) {
+
+    // create an identifying id from the object values
+    var id = [c.lat, c.long].join('|');
+
+    // if the id is not found in the temp array
+    // add the object to the output array
+    // and add the key to the temp array
+    if (p.temp.indexOf(id) === -1) {
+      p.out.push(c);
+      p.temp.push(id);
+    }
+    return p;
+
+  // return the deduped array
+  }, { temp: [], out: [] }).out;
+}
+
+  function uniq_fast(a) {
+    var seen = {};
+    var out = [];
+    var len = a.length;
+    var j = 0;
+    for(var i = 0; i < len; i++) {
+         var item = a[i];
+         if(seen[item] !== 1) {
+               seen[item] = 1;
+               out[j++] = item;
+         }
+    }
+    return out;
+}
+
+function frequencyUser(list){
+  var counts = {};
+
+  for(var i = 0; i< list.length; i++) {
+      var num = list[i];
+      counts[num] = counts[num] ? counts[num]+1 : 1;
+  }
+
+
+  var sortable = [];
+  for (var user in counts) {
+      sortable.push([user, counts[user]]);
+  }
+
+  sortable.sort(function(a, b) {
+      return b[1] - a[1];
+  });
+
+
+  return sortable.slice(0,50);
+}
+function showMap(diseaseName, colorMap){
+
+  firstColor = colorMap
+  lastColor = "#000000"
+// secondColor = colorRange(firstColor, lastColor, 0.7)
+// thirdColor = colorRange(secondColor, lastColor,0.55)
+
+color = d3.scale.linear()
+   .domain([-1,0,1])
+    .range([firstColor,lastColor]);
+
+secondColor = color(-0.5)
+thirdColor = color(-0.25)
+
+d3.json("LocationDiseaseFreq.json", function(error, dict) {
+
+debugger;
+var freData = {cnt:[]};    
+
+//by changing the j you are changing the disease name
+// j = 13 is pysch
+var diseaseIndex;
+for(j = 0 ; j < dict.length; j++){
+  if(dict[j].key == diseaseNameMap){
+    diseaseIndex = j;
+  }
+}
+
+
+maxLegend = Math.max.apply(Math,dict[diseaseIndex]['value'].map(function(o){return o.cnt;}))
+minLegend = Math.min.apply(Math,dict[diseaseIndex]['value'].map(function(o){return o.cnt;}))
+portion = (maxLegend + minLegend) / 4;
+legendDemo();
+
+for(i = 0 ; i < dict[diseaseIndex]['value'].length; i++){
+    if(dict[diseaseIndex]['value'][i].cnt < minLegend + portion){
+       freData.cnt.push({
+              name: dict[diseaseIndex]['value'][i].location ,
+              freq: dict[diseaseIndex]['value'][i].cnt,
+              fillKey: 'first',
+               radius: Math.sqrt(dict[diseaseIndex]['value'][i].cnt),
+                latitude: dict[diseaseIndex]['value'][i].lat,
+                  longitude: dict[diseaseIndex]['value'][i].long
+          
+              })
+      }
+     
+     if(dict[diseaseIndex]['value'][i].cnt < minLegend + (2*portion) && dict[diseaseIndex]['value'][i].cnt >= minLegend + portion){
+       freData.cnt.push({
+              name: dict[diseaseIndex]['value'][i].location ,
+              freq: dict[diseaseIndex]['value'][i].cnt,
+              fillKey: 'second',
+               radius: Math.sqrt(dict[diseaseIndex]['value'][i].cnt),
+                latitude: dict[diseaseIndex]['value'][i].lat,
+                  longitude: dict[diseaseIndex]['value'][i].long
+          
+              })
+     }
+     if(dict[diseaseIndex]['value'][i].cnt < minLegend + (3*portion) && dict[diseaseIndex]['value'][i].cnt >= minLegend + (2*portion)){
+       freData.cnt.push({
+              name: dict[diseaseIndex]['value'][i].location ,
+              freq: dict[diseaseIndex]['value'][i].cnt,
+              fillKey: 'third',
+               radius: Math.sqrt(dict[diseaseIndex]['value'][i].cnt),
+                latitude: dict[diseaseIndex]['value'][i].lat,
+                  longitude: dict[diseaseIndex]['value'][i].long
+          
+              })
+     }
+     if(dict[diseaseIndex]['value'][i].cnt >= minLegend + (3*portion)){
+       freData.cnt.push({
+              name: dict[diseaseIndex]['value'][i].location ,
+              freq: dict[diseaseIndex]['value'][i].cnt,
+              fillKey: 'forth',
+               radius: Math.sqrt(dict[diseaseIndex]['value'][i].cnt),
+                latitude: dict[diseaseIndex]['value'][i].lat,
+                  longitude: dict[diseaseIndex]['value'][i].long
+          
+              })
+     }
+  }
+debugger;
+a = d3.selectAll('.datamaps-hoverover')
+if(a[0].length > 0)
+  a = d3.selectAll('.datamaps-hoverover').remove()
+
+if(document.getElementById('mapSvg') != null)
+  document.getElementById('mapSvg').remove()
+
+debugger;
+  var freqMap = new Datamap({
+    element: document.getElementById('container'),
+    scope: 'usa',
+    data_width: '100',
+    geographyConfig: {
+        popupOnHover: true,
+        highlightOnHover: true
+    },
+    strokes : '0',
+    fills: {
+        'first': firstColor,
+        'second': secondColor,
+        'third': thirdColor,
+        'forth': lastColor,
+        defaultFill: '#e2ddc7'
+    }
+});
+
+
+
+var frequencyData = freData.cnt;
+ 
+
+//draw bubbles for frequencyData
+freqMap.bubbles(frequencyData, {
+    popupTemplate: function (geo, data) {
+            return ['<div class="hoverinfo">' +  data.name,
+            '<br/>Frequency: ' +  data.freq + ' tweet(s)',
+            '</div>'].join('');
+    }
+});
+
+d3.json("userData.json", function(error, userData){
+
+  debugger;
+
+cancerUserList = [];
+bloodUserList = [];
+psychUserList = [];
+
+rareDiseaseList = [];
+excretoryList = [];
+injuryList = [];
+musculoskeletalList = [];
+multipleList = [];
+neurologicalList = [];
+immuneList = [];
+congenitalList = [];
+infectiousList = [];
+reprodcutiveList = [];
+senseOrgansList = [];
+lymphaticList = [];
+digestiveList = [];
+metabolicList = [];
+respiratoryList = [];
+skinList = [];
+cardiovascularList = [];
+
+for(j = 0 ; j < userData.length; j++){
+  for(i = 0 ; i < userData[j].value.length; i++){
+    if(userData[j].value[i].diseaseName == "cancer")
+      cancerUserList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "blood")
+      bloodUserList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Psych")
+      psychUserList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "RareDisease")
+      rareDiseaseList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Excretory")
+      excretoryList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Injury")
+      injuryList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "Musculoskeletal")
+      musculoskeletalList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Multiple")
+      multipleList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Neurological")
+      neurologicalList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "Immune")
+      immuneList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "CongenitalAnomolies")
+      congenitalList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "InfectiousParasitic")
+      infectiousList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "Reproductive")
+      reprodcutiveList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "SenseOrgansSkin")
+      senseOrgansList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Lymphatic")
+      lymphaticList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "Digestive")
+      digestiveList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Metabolic")
+      metabolicList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "Respiratory")
+      respiratoryList.push(userData[i].userId);
+
+    if(userData[j].value[i].diseaseName == "Skin")
+      skinList.push(userData[i].userId);
+    if(userData[j].value[i].diseaseName == "cardiovascular")
+      cardiovascularList.push(userData[i].userId);
+
+  }
+}
+
+cancerUser = {diseaseName:'', value:[]}
+cancerUser.diseaseName = "cancer";
+cancerUser.value = frequencyUser(cancerUserList);
+
+bloodUser = {diseaseName:'', value:[]}
+bloodUser.diseaseName = "blood"
+bloodUser.value = frequencyUser(bloodUserList);
+
+psychUser = {diseaseName:'', value:[]}
+psychUser.diseaseName = "Psych";
+psychUser.value = frequencyUser(psychUserList);
+
+
+rareDiseaseUser = {diseaseName:'', value:[]}
+rareDiseaseUser.diseaseName = "RareDisease";
+rareDiseaseUser.value = frequencyUser(rareDiseaseList);
+
+excretoryUser = {diseaseName:'', value:[]}
+excretoryUser.diseaseName = "Excretory"
+excretoryUser.value = frequencyUser(excretoryList);
+
+injuryUser = {diseaseName:'', value:[]}
+injuryUser.diseaseName = "Injury";
+injuryUser.value = frequencyUser(injuryList);
+
+
+musculoskeletaUser = {diseaseName:'', value:[]}
+musculoskeletaUser.diseaseName = "Musculoskeletal";
+musculoskeletaUser.value = frequencyUser(musculoskeletalList);
+
+multipleUser = {diseaseName:'', value:[]}
+multipleUser.diseaseName = "Multiple"
+multipleUser.value = frequencyUser(multipleList);
+
+immuneUser = {diseaseName:'', value:[]}
+immuneUser.diseaseName = "Immune";
+immuneUser.value = frequencyUser(immuneList);
+
+
+congenitalUser = {diseaseName:'', value:[]}
+congenitalUser.diseaseName = "CongenitalAnomolies";
+congenitalUser.value = frequencyUser(congenitalList);
+
+infectiousUser = {diseaseName:'', value:[]}
+infectiousUser.diseaseName = "InfectiousParasitic"
+infectiousUser.value = frequencyUser(infectiousList);
+
+reprodcutiveUser = {diseaseName:'', value:[]}
+reprodcutiveUser.diseaseName = "Reproductive";
+reprodcutiveUser.value = frequencyUser(reprodcutiveList);
+
+
+senseOrgansUser = {diseaseName:'', value:[]}
+senseOrgansUser.diseaseName = "SenseOrgansSkin";
+senseOrgansUser.value = frequencyUser(senseOrgansList);
+
+lymphaticUser = {diseaseName:'', value:[]}
+lymphaticUser.diseaseName = "Lymphatic"
+lymphaticUser.value = frequencyUser(lymphaticList);
+
+digestiveUser = {diseaseName:'', value:[]}
+digestiveUser.diseaseName = "Digestive";
+digestiveUser.value = frequencyUser(digestiveList);
+
+
+metabolicUser = {diseaseName:'', value:[]}
+metabolicUser.diseaseName = "Metabolic";
+metabolicUser.value = frequencyUser(metabolicList);
+
+respiratoryUser = {diseaseName:'', value:[]}
+respiratoryUser.diseaseName = "Respiratory"
+respiratoryUser.value = frequencyUser(respiratoryList);
+
+skinUser = {diseaseName:'', value:[]}
+skinUser.diseaseName = "Skin"
+skinUser.value = frequencyUser(skinList);
+
+cardiovascularUser = {diseaseName:'', value:[]}
+cardiovascularUser.diseaseName = "cardiovascular"
+cardiovascularUser.value = frequencyUser(cardiovascularList);
+
+
+diseaseUser = [];
+diseaseUser.push(cardiovascularUser);
+diseaseUser.push(skinUser);
+diseaseUser.push(reprodcutiveUser);
+diseaseUser.push(metabolicUser);
+diseaseUser.push(digestiveUser);
+diseaseUser.push(lymphaticUser);
+diseaseUser.push(senseOrgansUser);
+diseaseUser.push(reprodcutiveUser);
+diseaseUser.push(infectiousUser);
+diseaseUser.push(congenitalUser);
+diseaseUser.push(immuneUser);
+diseaseUser.push(multipleUser);
+diseaseUser.push(musculoskeletaUser);
+diseaseUser.push(injuryUser);
+diseaseUser.push(excretoryUser);
+diseaseUser.push(rareDiseaseUser);
+diseaseUser.push(psychUser);
+diseaseUser.push(bloodUser);
+diseaseUser.push(cancerUser);
+debugger;
+
+// //sort the frequency
+// var sortable = [];
+// for (var user in psychFreq) {
+//     sortable.push([user, psychFreq[user]]);
+// }
+
+// sortable.sort(function(a, b) {
+//     return b[1] - a[1];
+// });
+
+
+//   userObjList = [];
+//   for(i = 0 ; i < userData.length; i++){
+//     userObjList.push(userData[i].userId)
+//   }
+//  debugger;
+
+// userList = uniq_fast(userObjList);
+// data = [];
+// exist = false;
+// for(i = 0 ; i < userList.length; i++){
+//   for(j = 0 ; j <userData.length;j++){
+//     if(userData[j].userId == userList[i]){
+//       userObj = {userId:'', value:[]}
+//       temp = {location:'', timestamp:'', diseaseName:'',keyword: ''}
+//       if(data.length == 0){
+//         temp.location = userData[j].location;
+//         temp.timestamp = userData[j].timestamp;
+//         temp.diseaseName = userData[j].diseaseName;
+//         temp.keyword = userData[j].keyword;
+//         userObj.userId = userList[i];
+//         userObj.value.push(temp);
+//         data.push(userObj);
+//       }else{
+//         exist = false
+//         for(k = 0 ; k < data.length; k++){
+//           if(data[k].userId == userData[j].userId){
+//             exist = true;
+//             temp.location = userData[j].location;
+//             temp.timestamp = userData[j].timestamp;
+//             temp.diseaseName = userData[j].diseaseName;
+//             temp.keyword = userData[j].keyword;
+//             data[k].value.push(temp)
+//           }
+
+//         }
+//         if(exist == false){
+//           temp.location = userData[j].location;
+//           temp.timestamp = userData[j].timestamp;
+//           temp.diseaseName = userData[j].diseaseName;
+//           temp.keyword = userData[j].keyword;
+//           userObj.userId = userList[i];
+//           userObj.value.push(temp);
+//           data.push(userObj)
+//         }
+//       }
+    
+//      }
+//    }
+//  }
+  
+
+});
+
+
+});
+
+
+}
+
+
+</script>
+
+<script>
+  function legendDemo() {
+
+  sampleNumerical = [minLegend + portion ,minLegend + (2*portion) , minLegend + (3*portion) ,maxLegend];
+  sampleThreshold=d3.scale.threshold().domain(sampleNumerical).range(
+      [firstColor,secondColor,thirdColor,lastColor]);
+  horizontalLegend = d3.svg.legend().units("Freq").cellWidth(45).cellHeight(15).inputScale(sampleThreshold).cellStepping(100);
+
+  arr = d3.selectAll('#footer4 svg');
+  if (arr[0].length > 0)
+    d3.selectAll('#footer4 svg').remove()
+
+  d3.select("#footer4").append("svg:svg").append("g").attr("transform", "translate(50,70)").attr("class", "legend").call(horizontalLegend);
+
+  
+
+
+  }
+
+</script>
+</body>

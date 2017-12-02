@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+     <script src="js/hashtable.js"></script>
+    <script src="js/d3cloud.js"></script>
+    <script src="js/d3-tooltip.js"></script>
+     <link rel="stylesheet" href="css/app.css">
+    <link href="http://fonts.googleapis.com/css?family=Gorditas:700" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="row" style="padding:20px">
+    <div class="word-cloud-div col col-md-6">
+
+    </div>
+    <div class="timeLine col col-md-6">
+
+    </div>
+
+</div>
+</body>
+    <script>
+    //tag cloud logic
+     {
+         //cloud svg width and height
+         var cloudWidth = 600;
+         var cloudHeight = 500;
+         var svg = d3.select(".word-cloud-div").append("svg")
+                         .attr("width", cloudWidth)
+                         .attr("height", cloudHeight)
+                       .append("g")
+                         .attr("transform", "translate(" + cloudWidth / 2 + "," + cloudHeight / 2 + ")")
+
+         /* Initialize tooltip */
+         var wordTip = d3.tip()
+           .attr('class', 'd3-tip')
+           .offset([-10, 0])
+           .html(function (d) {
+               return "<strong>" + d.text + " :" + d.frequency + "</strong>";
+           });
+         svg.call(wordTip);
+
+
+         var topTerms;
+         //HashTable to store the data with TERM as a key
+         var allTerms = new Hashtable();
+         $(document).ready(function () {
+             var termsData;
+             //get frequency data
+             d3.json("data/termsfrequency.json", function (data) {
+                 var termsData = data;
+                 data.forEach(function (d) {
+                     allTerms.put(d.term, d.properties)
+                 });
+                 var temp = allTerms.entries();
+                 temp.sort(function (a, b) {
+                     return b[1].frequency - a[1].frequency;
+                 })
+                 //
+                 //get top 50 terms
+                 topTerms = temp.slice(0, 50)
+                 var fill = d3.scale.category20();
+                 var sizeScale = d3.scale.linear()
+                         .domain([250, d3.max(topTerms, function (d) { return d[1].frequency })])
+                         .range([5, 85]);
+                 var layout = d3.layout.cloud()
+                     .size([600, 500])
+                     .words(topTerms.map(function (d) {
+                         return { text: d[0], size: d[1].frequency / 15, frequency: d[1].frequency };
+                     }))
+                     .padding(5)
+                     .rotate(function () { return ~~(Math.random() * 2) * 90; })
+                     .font("Impact")
+                     .fontSize(function (d) { return sizeScale(d.frequency); })
+                     .on("end", draw)
+
+
+                 layout.start();
+
+                 function draw(words) {
+
+                     svg.selectAll("text")
+                       .data(words)
+                     .enter().append("text")
+                       .style("font-size", function (d) { return d.size + "px"; })
+                       .style("font-family", "Impact")
+                       .style("fill", function (d, i) { return fill(i); })
+                         .style("cursor", "pointer")
+                         .style("pointer-events", "all")
+                       .attr("text-anchor", "middle")
+                       .attr("transform", function (d) {
+                           return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                       })
+                         .attr("class", "cloud-terms")
+                         .text(function (d) { return d.text; })
+                        .on("mousemove", function (d) {
+                            //  d3.select(this).attr("opacity", "0.6");
+                            wordTip.show(d);
+                        })
+                        .on("mouseout", function (d) {
+                            d3.select(this).attr("opacity", "1");
+                            wordTip.hide();
+                        })
+                        .on("click", function (d) {
+                            //Click Logic goes here
+                            svg.selectAll(".cloud-terms")
+
+                                    .style("fill", function (d1, i) {
+                                        if (d.text == d1.text)
+                                            d1.active = !d1.active;
+                                        if (d1.active == undefined || d1.active == false)
+                                            return "grey";
+                                        else
+                                            return fill(i);
+                                    })
+                            //get Month Freq 
+                            $(".timeLine").empty();
+                            $(".timeLine").append("Selected word :" + d.text + "</br>");
+                            var result = getMonthFreq(d.text);
+                            result.forEach(function (d) {
+                                $(".timeLine").append(d.month + " " + d.freq.toString() + "</br>");
+                            })
+                        })
+
+
+                 }
+
+
+             });
+         });
+         function getMonthFreq(term) {
+             var termDetails = allTerms.get(term);
+             var result = [];
+             var Months = termDetails.monthfreq;
+             $(".timeLine").append("Total Frequency :" + termDetails.frequency + "</br>");
+             Months.forEach(function (d) {
+                 result.push({ "month": d.month, "freq": d.freq })
+             });
+             return result;
+
+         }
+     }
+    </script>
+</html>
