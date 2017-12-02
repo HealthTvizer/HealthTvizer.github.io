@@ -23,7 +23,6 @@ The key features of HealthTVizer are:
 The top user list represents the users based on the number of tweets about any particular disease type. After clicking on diseases cloud, the list will automatically update with respect to the corresponding disease. On hovering on the user ID or user tweets count bar, a table will pop up displaying the 20 tweets of that particular user.
 
 **Box B: Diseases map** 
-
 The distribution of top 20 users tweets related to all 21 different diseases is depicted in the United States map represent in Box B.  On loading of the application the map shows the user tweets related all the diseases. However, if a viewer clicks on the particular disease from disease cloud the map and user list bar chart will be updated automatically and visualize the related disease tweets locations.  
 
 **Box C: Network of Diseases and Keywords**
@@ -35,7 +34,7 @@ The diseases streamgraph represents the discussion about 21 diseases obtained by
 **Box E:**
 By default, the diseases keywords streamgraph draw the streamline for top 50 keywords based on the frequency. However, if a user clicks on a disease from the diseases cloud, the keywords streamgraph will update interactively and displays the most frequent 50 keywords about that disease. 
 
-###Use Case: 
+### Use Case: 
 
 After completing the development of HealthTvizer, we examine the application and explore some valuable and interesting user stories. 
 
