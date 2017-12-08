@@ -34,28 +34,34 @@
 	</div>
 	<div class="holder">
   	
-Figure 7 in the paper shows two example of <i>FeatureSelector</i> compared to <i>ScagExplorer</i>. This page contains 2 additional examples on the 'Major League Baseball' and 'Communities and Crime' data.
+After completing the development of HealthTvizer, we examine the application and explore some valuable and interesting user stories.
 
-<h3>Major League Baseball in the 2008 season</h3>
-The main idea of <i>FeatureSelector</i> is to cluster groups of variables based on the "Scagnostics signature", namely the distance between two variables is measured by how different their Scangostics are to the rest of the variables. The summary SPLOM among the representatives are formed as depicted in the right panel. Details within each cluster can be shown as another SPLOM by closing on any diagonal entry of the original SPLOM (origin of green arrow). As depicted, NOT all member variables (target of green arrow) are strongly correlated but they are grouped together by sharing similar-behaving features w.r.t. other variables.
+<h3>Use case on "Cancer" </h3>
 
-<center><img src="figures/Figure9d.png" width="98%" alt="DycomDetector" /></center>
+When we click on the "cancer" from the diseases, cloud our application automatically update the top user list and disease map. On the map, we notice a big circle in California as depicted in the following figure.
 
-<h3>Communities and Crime data</h3>
-The Communities and Crime data set contains 128 different dimensions and contains 1994 items describing various crime and non-crime related attributes of communities in the United States of
-America.<br> 
+<br>
+<img src="figures/storyCancer.png" width="50%" alt="HealthTvizer" />
+<br>
+On user list, we found that the user DwightJasonBain has more than a thousand tweets and we further examine what he is saying by clicking on the userID, and our application displays the tweets as the following figure. It reveals that the person was trying to raise fund for the treatment of his wife using "gofundme." The fundraising tweets drew the attention of the tweeter users and became spread a lot in California region. Hence we can observe a big black circle on the map. 
 
-The details between two clusters can be shown as a rectangle array of scatterplots by closing on an off-diagonal entry of the SPLOM (the scatterplot of <i>Var 6</i> vs. <i>Var 18</i>). The consistent patterns of these pairwise projections explain why these redundant variables should be clustered together so that users can focus on important variables in the summary SPLOM.
+<br>
+<img src="figures/cancerHover.png" width="50%" alt="HealthTvizer" />
+<br>
 
-<center><img src="figures/Figure9c.png" width="98%" alt="DycomDetector" /></center>
+<h3>Use case on "Autism" </h3>
+<br>
+<img src="figures/autism.png" width="100%" alt="HealthTvizer" />
+<br>
+In the above figure, (a) shows the keywords cloud for the Neurological diseases. When we observe the keywords, "autism" drew our attention, and we further examine that. If we hover on the keyword "autism" as the box (c) in the figure, we can notice a sudden hike in the streamgraph for the keyword "autism" on January 10, 2017. We further investigate it using the top user list and map. We discovered that there was something in San Marcos, CA.
+<br><br>
 
-Compared to <i>ScagExplorer</i>, <i>FeatureSelector</i> is more comprehensive and direct. <i>FeatureSelector</i> allows users to rapidly discern the relation between prototypical variables and so put the focus on analyzing the original variables. <br><br>
 
-	
+When we examine the user's tweets from the user list, we found that the user "AutismSocietySD" share lots of tweets about the "7th annual swimming with autism conference" on that day. Due to that reason, there was a high frequency of the keyword "autism" on January 10, 2017.
 </div>
 
 <div class="footer">
-		<span class="right">&copy; Last revised: November 29, 2017</span>
+		<span class="right">&copy; Last revised: December 2, 2017</span>
 		<div class="clearer"><span></span></div>
 	</div>
 </div>

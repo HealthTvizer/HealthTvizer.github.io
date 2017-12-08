@@ -39,6 +39,7 @@ By default, the diseases keywords streamgraph draw the streamline for top 50 key
 After completing the development of HealthTvizer, we examine the application and explore some valuable and interesting user stories. 
 
 **Use case on "Cancer"**
+
 When we click on the "cancer" from the diseases, cloud our application automatically update the top user list and disease map. On the map, we notice a big circle in California as depicted in the following figure. 
 ![ScreenShot](https://raw.githubusercontent.com/iDataVisualizationLab/HealthTvizer/master/images/cancer.png)
 On user list, we found that the user DwightJasonBain has more than a thousand tweets and we further examine what he is saying by clicking on the userID, and our application displays the tweets as the following figure. It reveals that the person was trying to raise fund for the treatment of his wife using "gofundme." The fundraising tweets drew the attention of the tweeter users and became spread a lot in California region. Hence we can observe a big black circle on the map. 

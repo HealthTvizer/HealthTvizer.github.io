@@ -1,22 +1,4 @@
-body {
-  background:white;
-  font: 14px Arial;
-  width: 90%;
-  height: 95%;
-  margin: auto;
-  padding-top: 1%;
-}
-
-body, table {
-  font: 12px Arial;
-}
-
-h5 {
-  margin-top: 0px;
-  margin-bottom: 5px;
-}
-
-  .d3-tip {
+.d3-tip {
       /*line-height: 1;*/
       /*font-weight: bold; */
       padding: 12px;
@@ -350,10 +332,4 @@ h5 {
   width: 80%;
   margin-right: auto;
   border: 1px solid #777;
-}
-h3{
-  color: #000;
-  font-size: 16px;
-  text-align: center;
-  font-weight: bold;
 }
