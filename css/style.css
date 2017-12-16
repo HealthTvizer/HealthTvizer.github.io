@@ -1,4 +1,22 @@
-.d3-tip {
+body {
+  background:white;
+  font: 14px Arial;
+  width: 90%;
+  height: 95%;
+  margin: auto;
+  padding-top: 1%;
+}
+
+body, table {
+  font: 12px Arial;
+}
+
+h5 {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
+  .d3-tip {
       /*line-height: 1;*/
       /*font-weight: bold; */
       padding: 12px;
@@ -256,14 +274,13 @@
     border-right: 1px solid #ccc;
   }
 .col-md-5 {
-    width: 40%;
+    width: 42%;
+    margin-right: 10px;
     height: 500px;
-    background: #fff;
 
 }
-.col-md-7 {
-    width: 40%;
-    background: #fff;
+  .col-md-7 {
+    width: 53%;
 }
 
 #userList{
@@ -326,7 +343,6 @@
 #network{
   margin-top: 10px;
   margin-bottom: 50px;
-  background: #fff;
   width: 95.5%;
 }
 #container8{
@@ -334,4 +350,10 @@
   width: 80%;
   margin-right: auto;
   border: 1px solid #777;
+}
+h3{
+  color: #000;
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
 }
