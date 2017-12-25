@@ -106,7 +106,6 @@
 #left2 {
   float: left;
   min-width: 35%;
-  min-height: 40%;
 }
 
 #tagCloud2{
@@ -157,7 +156,7 @@
 #container{
     float: : left;
     width: 50%; 
-    height: 500px; 
+    height: 400px; 
     margin: 0 auto
     
 }
@@ -257,9 +256,7 @@
   }
 .col-md-5 {
     width: 40%;
-    height: 500px;
     background: #fff;
-
 }
 .col-md-7 {
     width: 40%;
@@ -268,15 +265,12 @@
 
 #userList{
   border: 1px solid #777;
-  min-height: 600px;
   border-radius:10px;
-  min-height: 400px;
 }
 
 #map{
   border-radius:10px;
   border: 1px solid #777;
-  min-height: 600px;
 }
 #diseaseCloud{
   border-radius:3px;

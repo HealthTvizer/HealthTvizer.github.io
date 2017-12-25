@@ -14,7 +14,6 @@
   <script src="https://d3js.org/d3.v3.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="lib/datamaps.usa.min.js"></script>
   <script src="lib/colorbrewer.v1.min.js"></script>
   <script src="lib/hashtable.js"></script>
@@ -25,16 +24,6 @@
   <script src="js/legend.js"></script>
   <script type="http://spin.js.org/spin.js"></script>
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/app.css">
-
-    <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 </head>
 
@@ -53,7 +42,7 @@
     </div>
   </div>
 
-  <div id="footer2" class="row">
+  <div id="footer" class="row">
     <div id="userList" class="col-md-5">
     <h3>Top User List</h3>
       <div class="chart" id="userFreq"></div>
@@ -61,22 +50,15 @@
     <div id="map" class="col-md-7">
     <h3>Disease Map</h3>
       <div id="footer4" style="position: relative; left: 170px;"> </div>
-      <div id="container" style="height: 450px; width: 600px;" ></div>
+      <div id="container" style="height: 350px; width: 600px;" ></div>
     </div>
   </div>
-
-  <div class="row">
-  <br/>
-  </div> 
 
   <div id="footer" class="row">
       <div class="col-md-5" id="tagCloud" runat="server"><h3>Diseases cloud</h3></div>
       <div class="col-md-7" id="timeline" runat="server"><h3>Diseases streamgraph</h3></div>     
   </div>
-
-  <div class="row">
-  <br/>
-  </div> 
+ 
   <div id="footer2" class="row">
       <div class="col-md-5" id="tagCloud2" runat="server"><h3>Keywords cloud</h3></div>
       <div class="col-md-7" id="timeline2" runat="server"><h3>Keywords streamgraph</h3></div>
