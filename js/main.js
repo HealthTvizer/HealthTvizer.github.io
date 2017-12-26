@@ -207,8 +207,8 @@ var myDiseaseName = "all";
        // Tommy 2017 ************************************
         var svg8 = d3.select('.container8')
             .append("svg")
-            .attr("width", 1000)
-            .attr("height", 800);
+            .attr("width", 800)
+            .attr("height", 500);
 
         var width = +svg8.attr("width"),
             height = +svg8.attr("height");
