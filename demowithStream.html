@@ -1,0 +1,83 @@
+<meta charset="utf-8">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+    <meta name="description" content="HealthTvizer: Exploring Health Awareness in Twitter Data throughCoordinated Multiple Views"/>
+    <meta name="keywords" content="HealthTvizer"/>
+    <meta name="author" content="HealthTvizer"/>
+    <link rel="stylesheet" type="text/css" href="styles/default.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="styles/stylev2.css">
+    <link rel="shortcut icon" href="styles/HealthTvizer.png">
+
+    <title>HealthTvizer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="js/msdropdown/jquery.dd.js"></script>
+    <script src="js/msdropdown/select.js"></script>
+    <script src="lib/datamaps.usa.min.js"></script>
+    <script src="lib/colorbrewer.v1.min.js"></script>
+    <script src="lib/hashtable.js"></script>
+    <!--willremove-->
+    <!--<script src="lib/d3cloud.js"></script>-->
+    <!--willremove-->
+    <script src="lib/d3.layout.wordstream.js"></script>
+    <script src="lib/d3-tooltip.js"></script>
+    <script src="lib/cmatrix.js"></script>
+    <script src="js/terms-generator.js"></script>
+    <script src="js/legend.js"></script>
+    <script type="http://spin.js.org/spin.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/msdropdown/dd.css" />
+
+</head>
+
+<body>
+<div class="navigation">
+    <div id="menu">
+        <nav>
+            <ul>
+                <li><a href="index.html"><span style="color:#888">Video<span></a></li>
+                <li><a href="layout.html"><span style="color:#888">Layout</span></a></li>
+                <li><a href="usecases.html"><span style="color:#888">Use cases<span></a></li>
+                <li><a href="demos.html"><b><span style="color:#fff">Demo<span></b></a></li>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div id="footer" >
+    <div id="userList" class="col-md-6">
+        <h3>Top User List</h3>
+        <div class="chart" id="userFreq"></div>
+    </div>
+    <div id="map" class="col-md-6">
+        <h3>Disease Map</h3>
+        <div id="footer4" style="position: relative; left: 170px;"> </div>
+        <div id="container" style="height: 350px; width: 600px;" ></div>
+    </div>
+</div>
+
+<div id="footer3" >
+    <div class="col-md-12"  id="timeline" runat="server"><h3>Diseases streamgraph</h3>
+        <!--<div id="tagCloud" runat="server"></div>-->
+    </div>
+
+    <!--<div class="col-md-5" id="tagCloud" runat="server"><h3>Diseases cloud</h3></div>-->
+</div>
+
+<div id="footer2" >
+    <!--<div class="col-md-12" id="tagCloud2" runat="server"><h3>Keywords cloud</h3></div>-->
+    <!--<div class="col-md-7" id="timeline2" runat="server"><h3>Keywords streamgraph</h3></div>-->
+
+    <div class="col-md-12 container8" id="network container8">
+
+            <h3>Network of Diseases and Keywords</h3>
+
+    </div>
+</div>
+</body>
+
+<script src="js/maindemo.js"></script>

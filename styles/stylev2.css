@@ -1,0 +1,335 @@
+.d3-tip {
+      /*line-height: 1;*/
+      /*font-weight: bold; */
+      padding: 12px;
+      /*background: rgba(245, 245, 245, 0.90) !important;*/
+      /*color: #000;*/
+      border-radius: 2px;
+      /*font-size: 13px;*/
+      /*margin-top: 80px;*/
+      }
+
+.toolTip {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 8px sans-serif;
+        padding: 5px;
+        text-align: center;
+    }
+
+    text {
+        font: 10px sans-serif;
+        color: black;
+    }
+    text.value {
+        font-size: 10px;
+        fill: black;
+    }
+
+    .axisHorizontal path{
+        fill: none;
+    }
+
+    .axisHorizontal .tick line {
+        stroke-width: 1;
+        stroke: rgba(0, 0, 0, 0.2);
+    }
+
+    .bar {
+        fill: steelblue;
+        fill-opacity: .9;
+    }
+
+#visualizations {
+  height: 100%;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
+  background:#fff;
+}
+
+#options {
+  padding: 15px;
+}
+
+#topOptions {
+  display: inline-block;
+}
+
+#bottomOptions {
+  display: inline-block;
+}
+
+#sourceSelection {
+  float: left;
+  display: inline-block;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+#intervalSelection {
+  float: left;
+  display: inline-block;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+#chartSelection {
+  float: left;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+#numberTermsSelection {
+  float:left;
+  display: inline-block;
+  padding-right: 10px;
+}
+
+#updateButtonContainer {
+  float: left;
+  display: inline-block;
+}
+
+#left {
+  float: left;
+  width: 35%;
+}
+#left2 {
+  float: left;
+  min-width: 35%;
+}
+
+#tagCloud2{
+    /*width: 40%;*/
+    float: left;
+}
+#timeline2{
+    /*width: 60%;*/
+    /*float: right;*/
+    /*height: 500px;*/
+}
+
+
+#footer{
+
+/*    width: 100%;*/
+    border-radius:10px;
+    border: 1px;
+    height: 300px;
+    margin:20px;
+}
+
+#tagCloud{
+    /*width: 40%;*/
+    width: 100%;
+    float: left;
+}
+#timeline{
+    /*width: 60%;*/
+    /*float: right;*/
+    height: 650px;
+}
+
+
+#footer3{
+ 
+    width: 100%;
+    border-radius:10px;
+    border: 1px;
+    height: 600px;
+}
+
+#container{
+    float: : left;
+    width: 50%; 
+    height: 400px; 
+    margin: 0 auto
+    
+}
+
+#footerSpace{
+    width: 20%;
+    position: center;
+    border-radius:10px;
+    border: 1px;
+    height: 50px;
+} 
+
+#footer4{
+    width: 20%;
+    position: center;
+    border-radius:10px;
+    border: 1px;
+    height: 50px;
+}
+#userFreq{
+    float: : right;
+    width: 20%; 
+    /*height: 500px; 
+    margin: 0 auto*/
+
+}
+
+.chart div {
+  width: 20%;
+  float: left;
+  font: 5px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+#intervalSlider {
+  display: flex;
+  width: 90%;
+  margin-right: auto;
+  padding: 1%;
+  justify-content: center;
+}
+
+.active {
+  display:inline-block;
+}
+
+.inactive {
+  display: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}  
+
+.layerLine { 
+    stroke: black;
+    stroke-width: 0.02;
+    fill: none;
+  }
+  .d3-tooltip{
+      font-size: 8px;
+    background: #ccc;
+    border-radius: 10px;
+    padding: 8px;
+    border: .6px solid black;
+    margin-left: 200px;
+    margin-top: 20px;
+      pointer-events: none;
+  }
+  .singletwitt{
+    font-size: 13px;
+    font-weight: normal;
+    margin-bottom: 1px;
+    background: #fff;
+    padding: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: #000;
+  }
+  #tiptable tr{
+    margin-bottom: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+    #tiptable tr td{
+    background: #fff;
+    margin-bottom: 1px;
+    margin-right: 1px;
+    border-right: 1px solid #ccc;
+  }
+.col-md-5 {
+    width: 30%;
+    background: #fff;
+}
+.col-md-12 {
+    width: 100%;
+    background: #fff;
+}
+.col-md-6 {
+    width: 50%;
+    background: #fff;
+}
+
+#userList{
+  border: 1px solid #777;
+  border-radius:10px;
+}
+
+#map{
+  border-radius:10px;
+  border: 1px solid #777;
+    float: right;
+}
+#diseaseCloud{
+  border-radius:3px;
+  float: left;
+  border: 1px solid #777;
+  margin-right: 10px;
+}
+#diseaseStream{
+  border-radius:10px;
+  border: 1px solid #777;
+}
+
+#footer2{
+    width: calc(100% - 40px);
+    margin: 20px;
+    border-radius:10px;
+    border: 1px;
+}
+#tagCloud{
+  margin: 0px;
+  /*width: 42%;*/
+    width: 95%;
+  min-height: 370px;
+}
+
+#timeline{
+  border-radius:10px;
+  border: 1px solid #777;
+  width: calc(100% - 40px);
+  min-height: 600px;
+    margin-left:20px;
+    margin-top:10px;
+}
+#tagCloud2{
+  border-radius:10px;
+  border: 1px solid #777;
+  margin-right: 10px;
+  width: 100%;
+  min-height: 370px;
+}
+#timeline2{
+  border-radius:10px;
+  border: 1px solid #777;
+  width: 53%;
+  min-height: 370px;
+}
+#network{
+  margin-top: 10px;
+  margin-bottom: 50px;
+  background: #fff;
+  width: 95.5%;
+}
+.container8{
+  border-radius:10px;
+  /*width: 80%;*/
+    width: 95.5%;
+    margin-top: 10px;
+  margin-right: auto;
+  border: 1px solid #777;
+}

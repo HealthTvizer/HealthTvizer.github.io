@@ -147,6 +147,7 @@ input.search {
   border-radius: 4px;
   z-index: 110;
   box-shadow: 5px 5px 10px rgba(0,0,0,0.75);
+    pointer-events: none;
 }
 
 /* Creates a small triangle extender for the tooltip */

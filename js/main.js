@@ -561,7 +561,7 @@ function showNewWords2(vis, words) {
       mapList = []
       mapColorList = {}
       k = 0;
-      
+
       //Entering words
       cloud.enter().append("text")
               .style("font-size", function (d) {
@@ -597,7 +597,7 @@ function showNewWords2(vis, words) {
               .on("mouseout", function (d) {
                 // d3.select(this).attr("opacity", "1");
                 wordTip.hide();
-                
+
               })
               //handle single and double clicks
               .on("click", function (d) {
@@ -657,9 +657,9 @@ function showNewWords2(vis, words) {
     return {
       update: function (words) {
         var newHighRange;
-        
+
           newHighRange = 70;
-      
+
         sizeScale.domain([d3.min(words, function (d) {
           return d.freq
         }), d3.max(words, function (d) {
@@ -769,6 +769,7 @@ function showNewWords2(vis, words) {
 
     return {
       update: function (words) {
+          console.log(words);
         var newHighRange;
         
           newHighRange = 70;
