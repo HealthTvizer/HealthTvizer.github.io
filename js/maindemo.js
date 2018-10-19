@@ -645,7 +645,7 @@ function wordCloud(selector) {
             dates.push(row.date);});
 
         var xAxisScale = d3.scale.ordinal().domain(dates).rangeBands([0, width]);
-        var xAxis = d3.svg.axis().orient('bottom').scale(xAxisScale);
+        // var xAxis = d3.svg.axis().orient('bottom').scale(xAxisScale);
         //axisGroup.attr('transform', 'translate(' + (margins.left) + ',' + (height+margins.top+axisPadding) + ')');
         //var axisNodes = axisGroup.call(xAxis);
         //styleAxis(axisNodes);
@@ -942,7 +942,7 @@ function wordCloud(selector) {
 
     });
 
-    };
+    }
 
 
     return {
