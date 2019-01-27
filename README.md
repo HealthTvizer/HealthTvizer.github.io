@@ -3,6 +3,7 @@
 
 <!-- [![ScreenShot](https://github.com/iDataVisualizationLab/DycomDetector/blob/master/images/play-btn.png)](http://www.myweb.ttu.edu/mdykabir/DycomDetectorIntro.mp4) -->
 
+Talk: https://github.com/HealthTvizer/HealthTvizer.github.io/tree/master/talks
 
 Video and Online demo:   https://healthtvizer.github.io/.
 
