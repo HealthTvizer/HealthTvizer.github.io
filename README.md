@@ -3,9 +3,9 @@
 
 <!-- [![ScreenShot](https://github.com/iDataVisualizationLab/DycomDetector/blob/master/images/play-btn.png)](http://www.myweb.ttu.edu/mdykabir/DycomDetectorIntro.mp4) -->
 
-Video demo:  https://youtu.be/UjgwdhXVDKg
+Talk: https://github.com/HealthTvizer/HealthTvizer.github.io/tree/master/talks
 
-Online demo:  https://idatavisualizationlab.github.io/HealthTvizer/
+Video and Online demo:   https://healthtvizer.github.io/.
 
 Micro-blogging and social media data can help in predicting a variety of events and also able to detect the flow and evolution of the events and incidents like presidential elections and flu spread. Analyzing public user posts and shared information in social media can assist us in measuring various population characteristics, patterns, movements, and as well as the public health conditions. In this paper, we introduce HealthTVizer - a social media analytics tool, for exploring health awareness using Twitter data through interactive and interconnected multiple views. The tools assist a user in achieving a quick summary about the current diseases along with the geographical location on the United States map. 
 
